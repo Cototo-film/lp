@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>採用に動画を。建設業界の人材獲得を革新する動画採用サービス</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #06b6d4 50%, #f59e0b 75%, #ef4444 100%);
+            background-size: 300% 300%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) }
+            to { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8) }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .count-up {
+            font-weight: 900;
+            color: #3b82f6;
+        }
+
+        .section-spacing {
+            padding: 60px 0;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .price-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
+            border-color: #3b82f6;
+        }
+
+        .campaign-banner {
+            background: linear-gradient(45deg, #ef4444, #f59e0b);
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <!-- Campaign Banner -->
+    <div class="campaign-banner text-center py-3 text-white font-bold">
+        <i class="fas fa-fire mr-2"></i>
+        8月31日まで半額キャンペーン実施中！今すぐお申し込みを！
+        <i class="fas fa-fire ml-2"></i>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient section-spacing">
+        <div class="container mx-auto px-6 text-center">
+            <div class="fade-in">
+                <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
+                    採用に<span class="text-yellow-300">"動画"</span>を<br>
+                    使いませんか？
+                </h1>
+                <div class="glass-effect rounded-2xl p-8 mb-8 inline-block">
+                    <p class="text-2xl md:text-3xl font-bold mb-4">
+                        <span class="count-up text-5xl">3</span>分動画で応募者<span class="count-up text-5xl text-yellow-300">34%</span>増
+                    </p>
+                    <p class="text-lg opacity-90">【CareerBuilder調査】</p>
+                </div>
+                <div class="space-y-4">
+                    <button class="pulse-glow bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-6 px-12 rounded-full text-xl transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-video mr-3"></i>30秒で無料相談
+                    </button>
+                    <p class="text-lg opacity-90">※8/31まで半額キャンペーン告知</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="section-spacing bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-black mb-8 text-red-400">
+                    きつい・怖い・しんどい<br>
+                    現場イメージが応募を遠ざける
+                </h2>
+                <div class="glass-effect rounded-2xl p-8 inline-block">
+                    <p class="text-3xl font-bold mb-4">
+                        建設企業<span class="count-up text-5xl text-red-400">94%</span>が「人手不足」
+                    </p>
+                    <p class="text-lg opacity-90">【AGC 2024年調査】</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Root Cause -->
+    <section class="section-spacing bg-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black mb-12">
+                    写真と文字だけでは<br>
+                    <span class="text-blue-400">"空気感"</span>が伝わらない
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                    <div class="glass-effect rounded-2xl p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-red-400">従来の採用手法</h3>
+                        <ul class="space-y-4 text-lg">
+                            <li><i class="fas fa-times text-red-400 mr-3"></i>静的な写真のみ</li>
+                            <li><i class="fas fa-times text-red-400 mr-3"></i>文字情報中心</li>
+                            <li><i class="fas fa-times text-red-400 mr-3"></i>現場の雰囲気が不明</li>
+                        </ul>
+                    </div>
+                    <div class="glass-effect rounded-2xl p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-green-400">動画採用の効果</h3>
+                        <ul class="space-y-4 text-lg">
+                            <li><i class="fas fa-check text-green-400 mr-3"></i>閲覧率 <span class="font-bold text-green-400">+12%</span></li>
+                            <li><i class="fas fa-check text-green-400 mr-3"></i>応募率 <span class="font-bold text-green-400">+34%</span></li>
+                            <li><i class="fas fa-check text-green-400 mr-3"></i>現場の魅力を実感</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Youth Data -->
+    <section class="section-spacing bg-blue-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-8">
+                Z世代の<span class="count-up text-6xl text-yellow-300">57%</span>は<br>
+                短尺動画で仕事を探す
+            </h2>
+            <p class="text-xl opacity-90">【Yaguara 2025年調査データ】</p>
+        </div>
+    </section>
+
+    <!-- Solution Concept -->
+    <section class="section-spacing bg-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-12">
+                現場を映像で<br>
+                <span class="text-green-400">"見える化"</span>するしかない
+            </h2>
+            <div class="glass-effect rounded-2xl p-8 inline-block">
+                <p class="text-2xl md:text-3xl font-bold mb-4">
+                    動画求人はテキスト比エンゲージ
+                </p>
+                <p class="text-6xl md:text-8xl font-black text-yellow-300 mb-4">1,200%</p>
+                <p class="text-lg opacity-90">【LinkedIn調査データ】</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="section-spacing bg-gray-800">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16">3大ベネフィット</h2>
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-6">📈</div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-400">応募質UP</h3>
+                    <p class="text-lg">現場の雰囲気を事前に理解した質の高い応募者が増加</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-6">💰</div>
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">採用コスト50%削減</h3>
+                    <p class="text-lg">効率的な採用プロセスで大幅なコスト削減を実現</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-6">🎯</div>
+                    <h3 class="text-2xl font-bold mb-4 text-yellow-400">定着率15%向上</h3>
+                    <p class="text-lg">現実とのギャップが少なく離職率が大幅に改善</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-xl font-bold">
+                    <span class="count-up text-3xl text-green-400">79%</span>の企業が「動画応募が最適」
+                    <span class="text-sm opacity-75 ml-4">- Adobe Express調査</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before/After with Video -->
+    <section class="section-spacing bg-blue-900">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16">
+                導入前：応募ゼロ → 導入後：応募<span class="text-yellow-300">3.5倍</span>
+            </h2>
+
+            <!-- Reference Video -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold text-center mb-8 text-yellow-300">
+                    <i class="fas fa-play-circle mr-3"></i>実際の成功事例動画
+                </h3>
+                <div class="max-w-4xl mx-auto mb-8">
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/j9Gs7XMmvb0" 
+                            title="ミキ造園様 採用動画事例" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                <div class="text-center glass-effect rounded-2xl p-6 max-w-3xl mx-auto">
+                    <h4 class="text-xl font-bold mb-4 text-green-400">この動画が伝える力</h4>
+                    <div class="grid md:grid-cols-3 gap-6 text-sm">
+                        <div>
+                            <i class="fas fa-users text-blue-400 mb-2 text-lg block"></i>
+                            <strong>リアルな人間関係</strong><br>
+                            現場の温かい雰囲気とチームワーク
+                        </div>
+                        <div>
+                            <i class="fas fa-heart text-red-400 mb-2 text-lg block"></i>
+                            <strong>働く喜び</strong><br>
+                            感謝されるやりがいと成長実感
+                        </div>
+                        <div>
+                            <i class="fas fa-home text-yellow-400 mb-2 text-lg block"></i>
+                            <strong>ワークライフバランス</strong><br>
+                            家族を大切にできる働き方
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="glass-effect rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-green-400">実績データ</h3>
+                    <ul class="space-y-4 text-lg">
+                        <li><i class="fas fa-check text-green-400 mr-3"></i>32社導入実績</li>
+                        <li><i class="fas fa-check text-green-400 mr-3"></i>離職率 <span class="font-bold">-22%</span>改善</li>
+                        <li><i class="fas fa-check text-green-400 mr-3"></i>採用期間 <span class="font-bold">50%</span>短縮</li>
+                    </ul>
+                </div>
+                <div class="glass-effect rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-yellow-400">業界評価</h3>
+                    <p class="text-lg">
+                        <i class="fas fa-trophy text-yellow-400 mr-3"></i>
+                        建設業界専門誌<br>
+                        <strong>「Best Solution Award 2024」受賞</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Data -->
+    <section class="section-spacing bg-red-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-8">
+                2025年、建設業は<span class="text-yellow-300">50万人</span>不足へ
+            </h2>
+            <div class="glass-effect rounded-2xl p-8 inline-block mb-8">
+                <h3 class="text-2xl font-bold mb-4">今差別化しなければ、明日はもっと厳しい</h3>
+                <p class="text-lg opacity-90">ABC試算データ：人材確保競争は激化の一途</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Price Appeal -->
+    <section class="section-spacing bg-green-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-8">
+                動画制作 <span class="line-through text-gray-400">20万</span> → 今なら<span class="text-yellow-300">10万円</span>〜
+            </h2>
+            <p class="text-2xl font-bold text-yellow-300 mb-8">8/31まで限定！</p>
+            <div class="glass-effect rounded-2xl p-8 inline-block">
+                <h3 class="text-xl font-bold mb-4">コスト比較グラフ</h3>
+                <div class="flex justify-center items-end space-x-8 text-center">
+                    <div>
+                        <div class="bg-red-500 h-24 w-20 mb-2 rounded-t"></div>
+                        <p class="text-sm">従来採用費<br><strong>60万</strong></p>
+                    </div>
+                    <div>
+                        <div class="bg-blue-500 h-16 w-20 mb-2 rounded-t"></div>
+                        <p class="text-sm">動画採用<br><strong>30万</strong></p>
+                    </div>
+                    <div>
+                        <div class="bg-green-500 h-8 w-20 mb-2 rounded-t"></div>
+                        <p class="text-sm">キャンペーン<br><strong>15万</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan Comparison -->
+    <section class="section-spacing bg-gray-800">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-black text-center mb-16">キャンペーン価格（8/31まで半額）</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="price-card glass-effect rounded-2xl p-8 text-center">
+                    <h3 class="text-2xl font-bold mb-4 text-blue-400">ライト</h3>
+                    <div class="mb-6">
+                        <span class="text-lg line-through text-gray-400">20万</span>
+                        <span class="text-4xl font-black text-green-400 block">10万</span>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-6">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>撮影1日</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>動画1本</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>基本サポート</li>
+                    </ul>
+                </div>
+                <div class="price-card glass-effect rounded-2xl p-8 text-center border-yellow-400">
+                    <div class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-bold mb-4">人気</div>
+                    <h3 class="text-2xl font-bold mb-4 text-yellow-400">スタンダード</h3>
+                    <div class="mb-6">
+                        <span class="text-lg line-through text-gray-400">40万</span>
+                        <span class="text-4xl font-black text-green-400 block">20万</span>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-6">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>撮影2日</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>動画3本</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>充実サポート</li>
+                    </ul>
+                </div>
+                <div class="price-card glass-effect rounded-2xl p-8 text-center">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-400">プレミアム</h3>
+                    <div class="mb-6">
+                        <span class="text-lg line-through text-gray-400">70万</span>
+                        <span class="text-4xl font-black text-green-400 block">35万</span>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-6">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>撮影3日</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>動画5本</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>完全サポート</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guarantee -->
+    <section class="section-spacing bg-blue-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-12">
+                30日再編集保証＋効果ゼロなら全額返金
+            </h2>
+            <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+                <div class="glass-effect rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-green-400">安心の保証制度</h3>
+                    <ul class="space-y-4 text-lg">
+                        <li><i class="fas fa-shield-alt text-green-400 mr-3"></i>30日間無料再編集</li>
+                        <li><i class="fas fa-chart-line text-green-400 mr-3"></i>効果測定サポート</li>
+                        <li><i class="fas fa-money-bill-wave text-green-400 mr-3"></i>全額返金保証</li>
+                    </ul>
+                </div>
+                <div class="glass-effect rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-red-400">キャンペーン締切</h3>
+                    <div class="text-4xl font-black text-yellow-300 mb-4">8月31日</div>
+                    <div class="text-xl">23:59で終了</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section-spacing bg-gray-800">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-black text-center mb-16">よくある質問</h2>
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-blue-400">撮影で現場が停止しませんか？</h3>
+                    <p>作業の邪魔にならない効率的な撮影手法で、通常業務への影響を最小限に抑えます。</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-blue-400">ドローン撮影の許可は？</h3>
+                    <p>必要な申請・許可は全て弊社で代行いたします。お客様にお手間をおかけしません。</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-blue-400">著作権はどうなりますか？</h3>
+                    <p>制作した動画の著作権は全てお客様に帰属します。自由にご活用ください。</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-blue-400">納期はどのくらいですか？</h3>
+                    <p>撮影完了後、約2週間で初回編集版をお渡しします。修正含め1ヶ月以内に完成します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section-spacing bg-gray-900">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-black text-center mb-16">お客様の声</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-yellow-400">山田建設 山田社長</h3>
+                    <p class="text-sm italic">"応募の質が劇的に変わりました。現場を理解した人材が集まるようになり、定着率も大幅に改善しています。"</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-4 flex items中心 justify-center">
+                        <i class="fas fa-user text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-yellow-400">東京建設 佐藤部長</h3>
+                    <p class="text-sm italic">"動画を見て応募してくる方は、すでに現場の雰囲気を理解されているので、面接がスムーズになりました。"</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-20 h-20 bg-gray-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-yellow-400">関西工業 田中代表</h3>
+                    <p class="text-sm italic">"採用コストが半分になり、しかも良い人材が集まる。動画採用は投資対効果が抜群です。"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Form -->
+    <section class="section-spacing bg-yellow-500 text-black">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-8">無料相談は30秒で完了</h2>
+            <div class="max-w-2xl mx-auto">
+                <form class="space-y-6 mb-8">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="会社名" class="w-full p-4 rounded-lg text-black">
+                        <input type="text" placeholder="お名前" class="w-full p-4 rounded-lg text-black">
+                    </div>
+                    <input type="email" placeholder="メールアドレス" class="w-full p-4 rounded-lg text-black">
+                    <input type="tel" placeholder="電話番号" class="w-full p-4 rounded-lg text-black">
+                    <textarea placeholder="ご質問・ご要望" rows="4" class="w-full p-4 rounded-lg text-black"></textarea>
+                    <button type="submit" class="w-full bg-black text-yellow-500 font-bold py-6 px-8 rounded-lg text-xl hover:bg-gray-800 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-paper-plane mr-3"></i>無料相談を申し込む
+                    </button>
+                </form>
+                <div class="flex justify-center space-x-8">
+                    <div class="text-center">
+                        <i class="fas fa-phone text-3xl mb-2 block"></i>
+                        <p class="font-bold">TEL相談</p>
+                        <p>0120-XXX-XXX</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fab fa-line text-3xl mb-2 block"></i>
+                        <p class="font-bold">LINE相談</p>
+                        <p>@construction-video</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PS Section -->
+    <section class="section-spacing bg-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-8 text-yellow-400">追伸</h2>
+            <div class="glass-effect rounded-2xl p-8 max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-6">助成金活用で実質負担ゼロの事例も</h3>
+                <p class="text-lg mb-6">
+                    人材開発支援助成金など、各種助成金の活用により<br>
+                    動画制作費用を大幅に軽減できる場合があります。詳しくはご相談ください。
+                </p>
+                <div class="bg-red-600 text-white px-6 py-3 rounded-full inline-block font-bold text-lg">
+                    <i class="fas fa-clock mr-2"></i>
+                    半額キャンペーンは8月31日 23:59で終了
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4 text-yellow-400">動画採用サービス</h3>
+                <p class="text-gray-400">建設業界の人材獲得を革新する</p>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <p class="text-gray-400">&copy; 2024 Video Recruitment Service. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Fade-in animation for sections
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Count-up animation
+        function animateCountUp() {
+            const countElements = document.querySelectorAll('.count-up');
+            countElements.forEach(element => {
+                const target = parseInt(element.textContent);
+                let count = 0;
+                const increment = target / 100;
+                const timer = setInterval(() => {
+                    count += increment;
+                    if (count >= target) {
+                        element.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        element.textContent = Math.floor(count);
+                    }
+                }, 20);
+            });
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(animateCountUp, 1000);
+        });
+    </script>
+</body>
+</html>
