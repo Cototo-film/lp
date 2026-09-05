@@ -1,0 +1,370 @@
+#!/usr/bin/env bash
+#
+# adget — 参考にしたい広告動画を URL 一発でローカルに保存し、資料として蓄積する。
+#
+#   adget <URL> [<URL> ...]   URL を指定して保存
+#   adget                     クリップボードの URL を保存
+#   cat urls.txt | adget      標準入力のURLを一括保存
+#
+# 保存先 (既定): ~/Movies/AdSwipe/<年>/<投稿日>_<媒体>_<アカウント>_<ID>.mp4
+#   併せて .info.json (キャプション全文・全メタデータ) と
+#   .sheet.jpg (9分割コンテ用サムネ) を書き出し、index.tsv に1行追記する。
+#
+# 依存: yt-dlp, ffmpeg  (install.sh が Homebrew で入れる)
+
+set -uo pipefail
+
+# Shortcuts.app / Automator / launchd から呼ばれると PATH が最小構成になり
+# Homebrew の bin が見えない。無ければ「末尾に」足す。前置にすると、利用者が
+# 自分で入れた yt-dlp より Homebrew 版が優先されてしまうため。
+for d in /opt/homebrew/bin /usr/local/bin; do
+  case ":$PATH:" in
+    *":$d:"*) ;;
+    *) [ -d "$d" ] && PATH="$PATH:$d" ;;
+  esac
+done
+export PATH
+
+ADGET_DIR="${ADGET_DIR:-$HOME/Movies/AdSwipe}"
+ADGET_BROWSER="${ADGET_BROWSER:-}"
+# nightly 版などを使いたいときにバイナリを差し替えられるようにしておく。
+# X の仕様変更直後は nightly でないと通らないことがある。
+YTDLP="${ADGET_YTDLP:-yt-dlp}"
+
+make_sheet=1
+reveal=0
+force=0
+cookie_browser="$ADGET_BROWSER"
+urls=()
+
+usage() {
+  cat <<'USAGE'
+adget — 参考広告の動画を保存してライブラリ化する
+
+使い方:
+  adget <URL> [<URL> ...]     指定した URL を保存
+  adget                       クリップボードの URL を保存
+  cat urls.txt | adget        標準入力の URL を一括保存
+
+オプション:
+  -c, --cookies <browser>   ログインが要る投稿用。chrome / safari / firefox / brave / edge
+  -d, --dir <path>          保存先を変更 (既定: ~/Movies/AdSwipe)
+  -f, --force               既に保存済みでも取り直す
+  -r, --reveal              完了後に Finder で表示
+      --no-sheet            サムネシート (.sheet.jpg) を作らない
+  -h, --help                このヘルプ
+
+環境変数:
+  ADGET_DIR       保存先ルート
+  ADGET_BROWSER   Cookie を借りるブラウザの既定値
+  ADGET_YTDLP     使う yt-dlp のパス (nightly 版に差し替えたいとき)
+
+対応: X / Instagram / TikTok / YouTube / Facebook / Vimeo ほか yt-dlp 対応サイト全般
+USAGE
+}
+
+log()  { printf '%s\n' "$*" >&2; }
+err()  { printf '\033[31m%s\033[0m\n' "$*" >&2; }
+ok()   { printf '\033[32m%s\033[0m\n' "$*" >&2; }
+
+# ターミナル以外(ホットキー実行など)から呼ばれたときは macOS 通知で結果を伝える。
+notify() {
+  [ -t 2 ] && return 0
+  command -v osascript >/dev/null 2>&1 || return 0
+  local title="${1//\"/\\\"}" body="${2//\"/\\\"}"
+  osascript -e "display notification \"$body\" with title \"$title\"" >/dev/null 2>&1
+}
+
+need() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  err "$1 が見つかりません。tools/adget/install.sh を実行してください。"
+  return 1
+}
+
+# 値を取るオプションは引数の有無を先に確かめる。値なしで shift 2 すると
+# bash は shift に失敗して $1 が残り、while が無限ループになる。
+need_value() {
+  [ "$2" -ge 2 ] && return 0
+  err "$1 には値が必要です。"
+  exit 2
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -c|--cookies) need_value "$1" $#; cookie_browser="$2"; shift 2 ;;
+    -d|--dir)     need_value "$1" $#; ADGET_DIR="$2"; shift 2 ;;
+    -f|--force)   force=1; shift ;;
+    -r|--reveal)  reveal=1; shift ;;
+    --no-sheet)   make_sheet=0; shift ;;
+    -h|--help)    usage; exit 0 ;;
+    -*)           err "不明なオプション: $1"; usage; exit 2 ;;
+    *)            urls+=("$1"); shift ;;
+  esac
+done
+
+need "$YTDLP" || exit 1
+
+# 引数なし: パイプ入力があればそれを、無ければクリップボードを読む。
+if [ "${#urls[@]}" -eq 0 ]; then
+  if [ ! -t 0 ]; then
+    while IFS= read -r line; do
+      [ -n "$line" ] && urls+=("$line")
+    done
+  elif command -v pbpaste >/dev/null 2>&1; then
+    clip="$(pbpaste 2>/dev/null)"
+    [ -n "$clip" ] && urls+=("$clip")
+  fi
+fi
+
+if [ "${#urls[@]}" -eq 0 ]; then
+  err "URL がありません。引数で渡すか、URL をコピーしてから実行してください。"
+  notify "adget" "URL がありません"
+  exit 2
+fi
+
+INDEX="$ADGET_DIR/index.tsv"
+mkdir -p "$ADGET_DIR" || exit 1
+if [ ! -f "$INDEX" ]; then
+  printf '保存日時\t媒体\tアカウント\t投稿日\t尺(秒)\t解像度\tURL\tキャプション\tファイル\n' > "$INDEX"
+fi
+
+# yt-dlp の extractor 名を短い媒体名に寄せる。
+platform_label() {
+  case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+    twitter|x)          echo "x" ;;
+    instagram*)         echo "instagram" ;;
+    tiktok*)            echo "tiktok" ;;
+    youtube*)           echo "youtube" ;;
+    facebook*)          echo "facebook" ;;
+    vimeo*)             echo "vimeo" ;;
+    *)                  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9' ;;
+  esac
+}
+
+# ファイル名に使える文字だけ残す。
+slug() {
+  printf '%s' "$1" | tr -cd 'A-Za-z0-9._-' | cut -c1-40
+}
+
+# タブ・改行を潰して TSV の1セルに収める。
+# 日本語キャプションを cut で切ると多バイト文字の途中で切れることがあるので、
+# 最後に iconv -c で壊れたバイト列を落として妥当な UTF-8 に均す。
+oneline() {
+  printf '%s' "$1" | tr '\t\n\r' '   ' | cut -c1-300 | iconv -c -f UTF-8 -t UTF-8
+}
+
+# 動画から9枚抜いて 3x3 のシートにする。構成とカット割りを一目で見るため。
+#
+# fps フィルタで間引く手もあるが、端数の丸めで9枚に足りず最後のコマが黒く
+# なることがある。広告は落ち(商品名・CTA)が最後に来るので、頭に寄るのも
+# 末尾が欠けるのも困る。各コマの時刻を d*(i+0.5)/9 で明示して個別に抜く。
+build_sheet() {
+  local video="$1" out="$2" dur tmp t i n=9 rc frame attempt
+  command -v ffmpeg >/dev/null 2>&1 || return 1
+  command -v ffprobe >/dev/null 2>&1 || return 1
+
+  dur="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$video" 2>/dev/null)"
+  case "$dur" in
+    ''|*[!0-9.]*) return 1 ;;
+  esac
+  awk -v d="$dur" 'BEGIN { exit !(d > 0) }' || return 1
+
+  tmp="$(mktemp -d "${TMPDIR:-/tmp}/adget.XXXXXX")" || return 1
+
+  # 最後のコマは尺の 94% 付近を指すため、短い動画では最終フレームを飛び越して
+  # 何も返らないことがある。取れなかったコマだけ 3% ずつ手前に戻して拾い直す。
+  i=0
+  while [ "$i" -lt "$n" ]; do
+    frame="$tmp/$(printf '%02d' "$i").jpg"
+    attempt=0
+    while [ "$attempt" -lt 3 ]; do
+      t="$(awk -v d="$dur" -v i="$i" -v n="$n" -v a="$attempt" \
+        'BEGIN { p = (i + 0.5) / n - a * 0.03; if (p < 0) p = 0; printf "%.3f", d * p }')"
+      ffmpeg -v error -ss "$t" -i "$video" -frames:v 1 -q:v 2 "$frame" >/dev/null 2>&1
+      [ -s "$frame" ] && break
+      attempt=$((attempt + 1))
+    done
+    i=$((i + 1))
+  done
+
+  if [ "$(ls -1 "$tmp"/*.jpg 2>/dev/null | wc -l | tr -d ' ')" -ne "$n" ]; then
+    rm -rf "$tmp"
+    return 1
+  fi
+
+  ffmpeg -v error -y -framerate 1 -i "$tmp/%02d.jpg" \
+    -vf "scale=480:-2,tile=3x3" -frames:v 1 -q:v 3 "$out" >/dev/null 2>&1
+  rc=$?
+  rm -rf "$tmp"
+  return "$rc"
+}
+
+failed=0
+saved_last=""
+
+for raw in "${urls[@]}"; do
+  # 前後の空白を落とす。
+  url="$(printf '%s' "$raw" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+
+  case "$url" in
+    http://*|https://*) ;;
+    *) err "URL ではありません: $url"; failed=1; continue ;;
+  esac
+
+  # ?s=46 などの計測パラメータと /video/1 /photo/1 を落として正規化する。
+  url="${url%%\?*}"
+  url="$(printf '%s' "$url" | sed -E 's#/(video|photo)/[0-9]+/?$##; s#/+$##')"
+
+  # 使用側は ${cookie_args[@]+"..."} で展開する。macOS 標準の bash 3.2 は
+  # set -u 下で空配列を素朴に展開すると unbound variable で落ちるため。
+  cookie_args=()
+  [ -n "$cookie_browser" ] && cookie_args=(--cookies-from-browser "$cookie_browser")
+
+  log ""
+  log "▶ $url"
+
+  # ── 第1段階: メタデータだけ取得して保存名を確定させる ──────────────
+  # ダウンロード前に最終パスを決めておくと、重複判定も後段の処理も一意になる。
+  meta="$("$YTDLP" --no-playlist --skip-download --no-warnings \
+    --print "%(id)s" \
+    --print "%(extractor_key)s" \
+    --print "%(uploader_id,uploader,channel_id)s" \
+    --print "%(upload_date>%Y-%m-%d)s" \
+    --print "%(duration)s" \
+    --print "%(width)s" \
+    --print "%(height)s" \
+    --print "%(title)S" \
+    ${cookie_args[@]+"${cookie_args[@]}"} "$url" 2>/tmp/adget-meta.$$.log)"
+
+  if [ -z "$meta" ]; then
+    err "メタデータを取得できませんでした。"
+    sed -n '1,6p' "/tmp/adget-meta.$$.log" >&2
+    if [ -z "$cookie_browser" ] && grep -qiE 'log in|login|authenticat|not available|private|age' "/tmp/adget-meta.$$.log"; then
+      err ""
+      err "ログインが必要な投稿のようです。ブラウザの Cookie を借りて再実行してください:"
+      err "    adget -c chrome \"$url\""
+    fi
+    rm -f "/tmp/adget-meta.$$.log"
+    notify "adget: 失敗" "$url"
+    failed=1
+    continue
+  fi
+  rm -f "/tmp/adget-meta.$$.log"
+
+  {
+    read -r m_id
+    read -r m_extractor
+    read -r m_account
+    read -r m_date
+    read -r m_duration
+    read -r m_width
+    read -r m_height
+    read -r m_title
+  } <<EOF
+$meta
+EOF
+
+  platform="$(platform_label "${m_extractor:-NA}")"
+  account="$(slug "${m_account:-NA}")"
+  vid="$(slug "${m_id:-NA}")"
+  [ -z "$account" ] && account="unknown"
+  [ -z "$vid" ] && vid="noid"
+
+  # 投稿日が取れない媒体があるので、その場合は取得日で代替する。
+  case "$m_date" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) post_date="$m_date" ;;
+    *) post_date="$(date +%Y-%m-%d)" ;;
+  esac
+  year="${post_date%%-*}"
+
+  base="${post_date}_${platform}_${account}_${vid}"
+  outdir="$ADGET_DIR/$year"
+  target="$outdir/$base.mp4"
+  mkdir -p "$outdir" || { failed=1; continue; }
+
+  if [ -f "$target" ] && [ "$force" -eq 0 ]; then
+    ok "保存済み: $target"
+    saved_last="$target"
+    continue
+  fi
+
+  # 取り直しのときは、前回のシートを消してから入る。残しておくと
+  # 中身の違う動画に古いシートが付いたままになる。
+  rm -f "$outdir/$base.sheet.jpg"
+
+  # ── 第2段階: 確定した名前でダウンロード ────────────────────────────
+  dl_args=(
+    --no-playlist
+    -f "bv*+ba/b"
+    --merge-output-format mp4
+    --remux-video mp4
+    --write-info-json
+    --no-mtime
+    --concurrent-fragments 4
+    -o "$outdir/$base.%(ext)s"
+  )
+  [ "$force" -eq 1 ] && dl_args+=(--force-overwrites)
+
+  if ! "$YTDLP" "${dl_args[@]}" ${cookie_args[@]+"${cookie_args[@]}"} "$url"; then
+    err "ダウンロードに失敗しました: $url"
+    notify "adget: 失敗" "$url"
+    failed=1
+    continue
+  fi
+
+  # remux で .mp4 になる想定だが、念のため実体を探す。
+  if [ ! -f "$target" ]; then
+    found="$(ls -1 "$outdir/$base".* 2>/dev/null | grep -vE '\.(info\.json|sheet\.jpg)$' | head -n 1)"
+    if [ -n "$found" ]; then
+      target="$found"
+    else
+      err "保存先のファイルが見つかりません: $outdir/$base.*"
+      failed=1
+      continue
+    fi
+  fi
+
+  sheet=""
+  if [ "$make_sheet" -eq 1 ]; then
+    if build_sheet "$target" "$outdir/$base.sheet.jpg"; then
+      sheet="$outdir/$base.sheet.jpg"
+    else
+      log "  (サムネシートは作成できませんでした)"
+    fi
+  fi
+
+  # ── 索引に1行追記 ──────────────────────────────────────────────────
+  dur_s=""
+  case "$m_duration" in
+    ''|NA|*[!0-9.]*) dur_s="" ;;
+    *) dur_s="$(awk -v d="$m_duration" 'BEGIN { printf "%d", d + 0.5 }')" ;;
+  esac
+  res="NA"
+  case "${m_width}x${m_height}" in
+    *[!0-9x]*|x*|*x) res="NA" ;;
+    *) res="${m_width}x${m_height}" ;;
+  esac
+
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$(date '+%Y-%m-%d %H:%M')" \
+    "$platform" \
+    "${m_account:-NA}" \
+    "$post_date" \
+    "$dur_s" \
+    "$res" \
+    "$url" \
+    "$(oneline "${m_title:-}")" \
+    "${target##*/}" \
+    >> "$INDEX"
+
+  ok "保存: $target"
+  [ -n "$sheet" ] && log "  コンテ用シート: $sheet"
+  saved_last="$target"
+  notify "adget: 保存しました" "${target##*/}"
+done
+
+if [ -n "$saved_last" ] && [ "$reveal" -eq 1 ] && command -v open >/dev/null 2>&1; then
+  open -R "$saved_last"
+fi
+
+exit "$failed"
