@@ -11,6 +11,17 @@ description: 動画（YouTube Shorts / Reels / TikTok / 自社の納品動画な
 
 受け取り経路（優先順）:
 
+0. **Gemini API（URL のまま見られる唯一の経路）** … `generativelanguage.googleapis.com` はこの環境から到達できる。`GEMINI_API_KEY` が環境にあれば、YouTube URL をそのまま Gemini に渡して観察記録を取る:
+
+   ```bash
+   python3 tools/video_analyze/gemini_video.py "https://youtube.com/shorts/XXXX" --out <dir>
+   # -> <dir>/observation.md（逐語の文字起こし・テロップ・ショット一覧・視覚イベント、全部タイムコード付き）
+   python3 tools/video_analyze/gemini_video.py --list-models   # 使えるモデル名の確認
+   ```
+
+   役割分担を守る: **Gemini は目（観察）、分析は Claude が §3 のフレームでやる。** `--mode both` で Gemini 自身の分析も別ファイルに出せるが、それは参考意見として扱い、observation.md にない事実（チャンネルの出自、再生数、制作ツールの推測）は分析に混ぜない。ユーザーが Gemini の分析を貼ってきたときも同じで、観察記録と照合して裏が取れた部分だけ採用する。
+   キーが無ければ、ユーザーに `GEMINI_API_KEY` を環境変数（Claude Code on the web の環境設定）に入れてもらうか、このセッション限りで export してもらう。
+
 1. **Google Drive** … ユーザーが動画ファイル（mp4/mov）を Drive に置く → `mcp__Google_Drive__search_files` で `mimeType contains 'video/'` を検索 → `download_file_content` で base64 を受け取り、scratchpad に書き出す。Drive の Web UI は遮断されているが、MCP コネクタ経由の取得は通る。
 2. **Adobe Creative Cloud** … `asset_add_file` でユーザーにファイルを選んでもらう → `video_render_frame` で任意タイムコードのフレーム、`media_summarize` で発話要約。ローカル分解ができないので Drive 経路の補助扱い。
 3. **文字起こし＋スクショの貼り付け** … 動画本体が無理なら、ユーザーに YouTube の「文字起こしを表示」のコピーと、キーフレームのスクショを数枚もらう。分析フレーム（§3）はそのまま使える。
@@ -18,6 +29,8 @@ description: 動画（YouTube Shorts / Reels / TikTok / 自社の納品動画な
 YouTube Shorts をファイルにする方法はユーザー側で判断してもらう（自分の動画なら YouTube Studio からダウンロード、他人の動画なら画面収録など）。権利上の注意は一言添える。
 
 ## 1. 分解する（ツール）
+
+Gemini 経路で observation.md が取れた場合は §1 のローカル分解は不要（ファイルが無いので実行できない）。ファイルがある場合は両方やると、カット数や発話率の数値が取れて分析が固くなる。
 
 ```bash
 # 初回のみ
