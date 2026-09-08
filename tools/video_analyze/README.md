@@ -19,6 +19,7 @@ python3 analyze.py video.mp4 --lang ja   # -> video_analysis/report.md ほか
 ```bash
 export GEMINI_API_KEY=...                       # https://aistudio.google.com/apikey
 python3 gemini_video.py "https://youtube.com/shorts/XXXX" --out out_dir
+python3 gemini_video.py URL --prompt-file prompts/visual_craft.md   # 映像の作り（レンダリング・カメラ・テロップ組版）に絞った観察
 python3 gemini_video.py --list-models           # モデル名の確認（既定: gemini-2.5-flash（無料枠で使える）。Pro 系は課金有効化が必要。GEMINI_MODEL で変更）
 ```
 

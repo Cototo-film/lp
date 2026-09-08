@@ -170,6 +170,9 @@ def main() -> None:
     ap.add_argument("--mode", choices=["observe", "analyze", "both"], default="observe",
                     help="observe = facts only (default; Claude does the analysis). "
                          "analyze/both = also ask Gemini for its own analysis, kept in a separate file")
+    ap.add_argument("--prompt-file", default=None,
+                    help="use this file as the observation prompt instead of the built-in one "
+                         "(e.g. a visual-craft or typography checklist); output goes to observation_<name>.md")
     ap.add_argument("--list-models", action="store_true")
     args = ap.parse_args()
 
@@ -184,10 +187,14 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     vp = video_part(args.source)
+    prompt, obs_name = OBSERVE_PROMPT, "observation.md"
+    if args.prompt_file:
+        prompt = Path(args.prompt_file).read_text(encoding="utf-8")
+        obs_name = f"observation_{Path(args.prompt_file).stem}.md"
     print(f"[observe] {args.model} <- {args.source}", file=sys.stderr)
-    obs = generate(args.model, [vp, {"text": OBSERVE_PROMPT}])
-    (out / "observation.md").write_text(obs, encoding="utf-8")
-    print(f"wrote {out/'observation.md'}", file=sys.stderr)
+    obs = generate(args.model, [vp, {"text": prompt}])
+    (out / obs_name).write_text(obs, encoding="utf-8")
+    print(f"wrote {out/obs_name}", file=sys.stderr)
 
     if args.mode in ("analyze", "both"):
         print(f"[analyze] {args.model}", file=sys.stderr)
