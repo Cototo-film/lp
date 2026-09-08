@@ -30,7 +30,7 @@ import urllib.request
 from pathlib import Path
 
 API = "https://generativelanguage.googleapis.com"
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-pro")
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")  # Flash works on the free tier; Pro models need Cloud billing
 INLINE_LIMIT = 19 * 1024 * 1024   # inline base64 limit is 20MB total request
 
 OBSERVE_PROMPT = """あなたは映像の観察係です。判断や評価はせず、動画に「実際に含まれているもの」だけを、タイムコード付きで書き出してください。推測は書かない。聞き取れない・読めない箇所は [不明] と書く。
