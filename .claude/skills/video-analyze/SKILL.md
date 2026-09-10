@@ -11,7 +11,7 @@ description: 動画（YouTube Shorts / Reels / TikTok / 自社の納品動画な
 
 受け取り経路（優先順）:
 
-0. **Gemini API（URL のまま見られる唯一の経路）** … `generativelanguage.googleapis.com` はこの環境から到達できる。`GEMINI_API_KEY` が環境にあれば、YouTube URL をそのまま Gemini に渡して観察記録を取る:
+0. **Gemini API（URL のまま見られる唯一の経路、YouTube 限定）** … `generativelanguage.googleapis.com` はこの環境から到達できる。Gemini が URL のまま受け取れるのは YouTube だけで、Instagram / TikTok / X の URL は 400 で弾かれる（確認済み）。それらはファイル経路（1 以降）しかない。`GEMINI_API_KEY` が環境にあれば、YouTube URL をそのまま Gemini に渡して観察記録を取る:
 
    ```bash
    python3 tools/video_analyze/gemini_video.py "https://youtube.com/shorts/XXXX" --out <dir>
